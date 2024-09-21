@@ -1,0 +1,56 @@
+﻿@page "/orders"
+@using BlazorTestApp.MockData
+@using BlazorTestApp.Models
+
+<h3>Order Management</h3>
+
+<MudForm Model="newOrder" OnValidSubmit="AddOrder">
+@*     <MudTextField @bind-Value="newOrder.OrderName" Label="Order Name" />
+    <MudNumericField @bind-Value="newOrder.Quantity" Label="Quantity" />
+    <MudNumericField @bind-Value="newOrder.Price" Label="Price ($)" />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Type="Submit">Add New Order</MudButton> *@
+</MudForm>
+
+<MudTable 
+    T="Order"
+    Items="orders"
+    Hover="true">
+    <HeaderContent>
+        <MudTh>Order Id</MudTh>
+        <MudTh>Order Name</MudTh>
+        <MudTh>Quantity</MudTh>
+        <MudTh>Price ($)</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <OrderRow Order="@context" OnDelete="HandleDeleteOrder" OnUpdate="HandleUpdateOrder" />
+    </RowTemplate>
+</MudTable>
+
+@code {
+    protected List<Order> orders;
+    protected Order newOrder = new Order();
+    private int nextOrderId = 4;
+
+    protected override void OnInitialized()
+    {
+        orders = OrderData.GetMockOrders();
+    }
+
+    private void AddOrder()
+    {
+        newOrder.OrderId = nextOrderId++;
+        orders.Add(newOrder);
+        newOrder = new Order(); // Reset the form
+    }
+
+    private void HandleDeleteOrder(Order order)
+    {
+        orders.Remove(order);
+    }
+
+    private void HandleUpdateOrder(Order order)
+    {
+        // Update logic if necessary (orders are updated in place)
+    }
+}

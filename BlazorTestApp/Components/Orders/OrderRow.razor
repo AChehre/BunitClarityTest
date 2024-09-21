@@ -1,0 +1,56 @@
+﻿@using BlazorTestApp.Models
+<MudTd>@Order.OrderId</MudTd>
+<MudTd>@Order.OrderName</MudTd>
+<MudTd>@Order.Quantity</MudTd>
+<MudTd>@Order.Price.ToString("F2")</MudTd>
+<MudTd>
+    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="EditOrder">Edit</MudButton>
+    <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="DeleteOrder">Delete</MudButton>
+</MudTd>
+
+@code {
+    [Parameter]
+    public Order Order { get; set; }
+
+    [Parameter]
+    public EventCallback<Order> OnDelete { get; set; }
+
+    [Parameter]
+    public EventCallback<Order> OnUpdate { get; set; }
+
+    private bool IsEditing { get; set; } = false;
+    private Order backupOrder;
+
+    private void EditOrder()
+    {
+        IsEditing = true;
+        // Create a backup of the order
+        backupOrder = new Order
+            {
+                OrderId = Order.OrderId,
+                OrderName = Order.OrderName,
+                Quantity = Order.Quantity,
+                Price = Order.Price
+            };
+    }
+
+    private async Task UpdateOrder()
+    {
+        IsEditing = false;
+        await OnUpdate.InvokeAsync(Order);
+    }
+
+    private void CancelEdit()
+    {
+        IsEditing = false;
+        // Restore original values
+        Order.OrderName = backupOrder.OrderName;
+        Order.Quantity = backupOrder.Quantity;
+        Order.Price = backupOrder.Price;
+    }
+
+    private async Task DeleteOrder()
+    {
+        await OnDelete.InvokeAsync(Order);
+    }
+}
